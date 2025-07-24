@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الوليد للطباعة</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --font-primary: 'Arial', sans-serif;
+            --font-arabic: 'Arial', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        [dir="rtl"] {
+            direction: rtl;
+            text-align: right;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .screen {
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        #auth-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .auth-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .logo {
+            max-width: 150px;
+            margin-bottom: 1rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            margin: 0.5rem 0;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .language-switcher {
+            margin-top: 1rem;
+        }
+
+        .lang-btn {
+            background: none;
+            color: var(--dark-color);
+            border: 1px solid #ddd;
+            margin: 0 0.25rem;
+        }
+
+        .lang-btn.active {
+            background-color: var(--dark-color);
+            color: white;
+        }
+
+        header {
+            background-color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        nav {
+            background-color: var(--dark-color);
+            display: flex;
+            overflow-x: auto;
+        }
+
+        .nav-btn {
+            background: none;
+            border-radius: 0;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+
+        .nav-btn.active {
+            border-bottom-color: var(--accent-color);
+        }
+
+        .content-screen {
+            padding: 1.5rem;
+            background-color: white;
+            margin: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .upload-area {
+            border: 2px dashed #ccc;
+            padding: 2rem;
+            text-align: center;
+            margin: 1rem 0;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+        }
+
+        #import-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .students-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .student-card {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .student-card h3 {
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .student-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow: auto;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .pdf-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .sheet-list {
+            margin: 1rem 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .sheet-item {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .sheet-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .sheet-item.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--secondary-color);
+        }
+
+        .data-preview {
+            max-height: 300px;
+            overflow: auto;
+            margin: 1rem 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            position: sticky;
+            top: 0;
+        }
+
+        .column-mapping {
+            margin: 1rem 0;
+        }
+
+        .mapping-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .mapping-row select {
+            margin-left: 0.5rem;
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- شاشة تسجيل الدخول -->
+        <div id="auth-screen" class="screen">
+            <div class="auth-container">
+                <img src="https://via.placeholder.com/150x50?text=الوليد+للطباعة" alt="شعار الوليد للطباعة" class="logo">
+                <h1>نظام طباعة الشهادات</h1>
+                <div id="login-form">
+                    <div id="auth-message" class="alert hidden"></div>
+                    <input type="email" id="email" placeholder="البريد الإلكتروني" value="admin@school.edu">
+                    <input type="password" id="password" placeholder="كلمة المرور" value="123456">
+                    <button id="login-btn">تسجيل الدخول</button>
+                    <button id="register-btn">إنشاء حساب جديد</button>
+                </div>
+                <div class="language-switcher">
+                    <button class="lang-btn active" data-lang="ar">العربية</button>
+                    <button class="lang-btn" data-lang="en">English</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- الشاشة الرئيسية -->
+        <div id="main-screen" class="screen hidden">
+            <header>
+                <img src="https://via.placeholder.com/150x50?text=شعار+المدرسة" alt="شعار المدرسة" class="logo">
+                <h1 id="school-name">مدرسة الوليد</h1>
+                <div class="user-menu">
+                    <span id="username-display">user@example.com</span>
+                    <button id="logout-btn">تسجيل الخروج</button>
+                </div>
+            </header>
+
+            <nav>
+                <button class="nav-btn active" data-screen="import">استيراد بيانات</button>
+                <button class="nav-btn" data-screen="students">إدارة الطلاب</button>
+                <button class="nav-btn" data-screen="templates">قوالب الطباعة</button>
+                <button class="nav-btn" data-screen="settings">الإعدادات</button>
+                <button class="nav-btn" data-screen="backup">النسخ الاحتياطي</button>
+            </nav>
+
+            <main>
+                <!-- شاشة استيراد البيانات -->
+                <div id="import-screen" class="content-screen">
+                    <h2>استيراد بيانات الطلاب</h2>
+                    <div class="upload-area" id="drop-area">
+                        <input type="file" id="excel-file" accept=".xlsx, .xls">
+                        <label for="excel-file" class="upload-label">
+                            <span>اسحب وأسقط ملف Excel هنا أو انقر للاختيار</span>
+                        </label>
+                        <div id="file-info"></div>
+                    </div>
+                    <div id="sheet-selection" class="hidden">
+                        <h3>اختر الورقة (Sheet) التي تحتوي على بيانات الطلاب:</h3>
+                        <ul class="sheet-list" id="sheet-list"></ul>
+                    </div>
+                    <div id="year-selection" class="hidden">
+                        <h3>السنة الدراسية:</h3>
+                        <input type="text" id="academic-year" placeholder="سيتم التعرف عليها تلقائياً">
+                    </div>
+                    <div id="data-preview" class="data-preview hidden"></div>
+                    <div id="column-mapping" class="column-mapping hidden">
+                        <h3>تحديد أعمدة البيانات:</h3>
+                        <div class="mapping-row">
+                            <span>رقم الطالب:</span>
+                            <select id="id-column"></select>
+                        </div>
+                        <div class="mapping-row">
+                            <span>اسم الطالب:</span>
+                            <select id="name-column"></select>
+                        </div>
+                        <div class="mapping-row">
+                            <span>الصف الدراسي:</span>
+                            <select id="class-column">
+                                <option value="auto">استخدام اسم الشيت تلقائياً</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="import-options">
+                        <button id="import-btn" disabled>استيراد البيانات</button>
+                    </div>
+                    <div id="import-message" class="alert hidden"></div>
+                    <div id="import-loader" class="loader hidden"></div>
+                </div>
+
+                <!-- شاشة إدارة الطلاب -->
+                <div id="students-screen" class="content-screen hidden">
+                    <h2>إدارة بيانات الطلاب</h2>
+                    <div class="filters">
+                        <select id="year-filter">
+                            <option value="">كل السنوات</option>
+                        </select>
+                        <select id="class-filter">
+                            <option value="">كل الصفوف</option>
+                        </select>
+                        <button id="print-all-btn">طباعة الفصل كاملًا</button>
+                    </div>
+                    <div id="students-message" class="alert hidden"></div>
+                    <div id="students-loader" class="loader hidden"></div>
+                    <div class="students-list" id="students-list"></div>
+                </div>
+
+                <!-- شاشة قوالب الطباعة -->
+                <div id="templates-screen" class="content-screen hidden">
+                    <h2>إدارة قوالب الطباعة</h2>
+                    <div id="templates-message" class="alert hidden"></div>
+                    <div class="template-preview" id="template-preview">
+                        <p>معاينة القالب ستظهر هنا</p>
+                    </div>
+                    <div class="template-options">
+                        <h3>تخصيص القالب</h3>
+                        <label>شعار المدرسة:</label>
+                        <input type="file" id="logo-upload" accept="image/*">
+                        <label>لون الخلفية:</label>
+                        <input type="color" id="bg-color" value="#ffffff">
+                        <label>لون النص:</label>
+                        <input type="color" id="text-color" value="#000000">
+                        <label>الخط:</label>
+                        <select id="font-select">
+                            <option value="Arial">Arial</option>
+                            <option value="'Times New Roman'">Times New Roman</option>
+                        </select>
+                        <button id="save-template-btn">حفظ القالب</button>
+                    </div>
+                </div>
+
+                <!-- شاشة الإعدادات -->
+                <div id="settings-screen" class="content-screen hidden">
+                    <h2>إعدادات النظام</h2>
+                    <div id="settings-message" class="alert hidden"></div>
+                    <div class="settings-section">
+                        <h3>إدارة المدرسة</h3>
+                        <label>اسم المدرسة:</label>
+                        <input type="text" id="school-name-input" value="مدرسة الوليد">
+                        <label>العنوان:</label>
+                        <input type="text" id="school-address" value="الرياض، السعودية">
+                    </div>
+                    <div class="settings-section">
+                        <h3>إعدادات اللغة</h3>
+                        <select id="language-select">
+                            <option value="ar">العربية</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                    <button id="save-settings-btn">حفظ الإعدادات</button>
+                </div>
+
+                <!-- شاشة النسخ الاحتياطي -->
+                <div id="backup-screen" class="content-screen hidden">
+                    <h2>النسخ الاحتياطي</h2>
+                    <div id="backup-message" class="alert hidden"></div>
+                    <div class="backup-options">
+                        <h3>تصدير البيانات</h3>
+                        <button id="export-data-btn">تصدير جميع البيانات</button>
+                        <button id="export-students-btn">تصدير بيانات الطلاب فقط</button>
+                        
+                        <h3 style="margin-top: 2rem;">استيراد البيانات</h3>
+                        <input type="file" id="backup-file" accept=".json">
+                        <button id="import-backup-btn">استيراد البيانات</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- مشغل PDF -->
+        <div id="pdf-viewer" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <iframe id="pdf-frame" style="width:100%; height:80vh; border:none;"></iframe>
+                <div class="pdf-actions">
+                    <button id="download-pdf-btn">تنزيل PDF</button>
+                    <button id="print-pdf-btn">طباعة</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // عناصر واجهة المستخدم
+            const navButtons = document.querySelectorAll('.nav-btn');
+            const contentScreens = document.querySelectorAll('.content-screen');
+            const logoutBtn = document.getElementById('logout-btn');
+            const importBtn = document.getElementById('import-btn');
+            const excelFileInput = document.getElementById('excel-file');
+            const dropArea = document.getElementById('drop-area');
+            const printAllBtn = document.getElementById('print-all-btn');
+            const pdfViewer = document.getElementById('pdf-viewer');
+            const closePdfBtn = document.querySelector('.close-btn');
+            const downloadPdfBtn = document.getElementById('download-pdf-btn');
+            const printPdfBtn = document.getElementById('print-pdf-btn');
+            const studentsList = document.getElementById('students-list');
+            const loginBtn = document.getElementById('login-btn');
+            const registerBtn = document.getElementById('register-btn');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const authMessage = document.getElementById('auth-message');
+            const sheetList = document.getElementById('sheet-list');
+            const sheetSelection = document.getElementById('sheet-selection');
+            const yearSelection = document.getElementById('year-selection');
+            const academicYearInput = document.getElementById('academic-year');
+            const dataPreview = document.getElementById('data-preview');
+            const columnMapping = document.getElementById('column-mapping');
+            const idColumnSelect = document.getElementById('id-column');
+            const nameColumnSelect = document.getElementById('name-column');
+            const classColumnSelect = document.getElementById('class-column');
+            const exportDataBtn = document.getElementById('export-data-btn');
+            const exportStudentsBtn = document.getElementById('export-students-btn');
+            const importBackupBtn = document.getElementById('import-backup-btn');
+            const backupFileInput = document.getElementById('backup-file');
+
+            // حالة التطبيق
+            const appState = {
+                currentUser: null,
+                db: null,
+                selectedStudent: null,
+                currentTemplate: null,
+                excelSheets: [],
+                selectedSheet: null,
+                sheetData: [],
+                headers: [],
+                columnMap: {
+                    id: null,
+                    name: null,
+                    class: null
+                },
+                fileName: ''
+            };
+
+            // تهيئة قاعدة البيانات
+            function initDatabase() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open('SchoolDB', 1);
+                    
+                    request.onerror = (event) => {
+                        console.error('فشل فتح قاعدة البيانات:', event.target.error);
+                        reject(event.target.error);
+                    };
+                    
+                    request.onsuccess = (event) => {
+                        appState.db = event.target.result;
+                        console.log('تم تهيئة قاعدة البيانات بنجاح');
+                        resolve(appState.db);
+                    };
+                    
+                    request.onupgradeneeded = (event) => {
+                        const db = event.target.result;
+                        
+                        // إنشاء مخزن للطلاب
+                        const studentsStore = db.createObjectStore('students', { keyPath: 'id', autoIncrement: true });
+                        studentsStore.createIndex('studentNumber', 'studentNumber', { unique: true });
+                        studentsStore.createIndex('classId', 'classId', { unique: false });
+                        studentsStore.createIndex('academicYear', 'academicYear', { unique: false });
+                        
+                        // إنشاء مخزن للمواد الدراسية
+                        const subjectsStore = db.createObjectStore('subjects', { keyPath: 'id', autoIncrement: true });
+                        subjectsStore.createIndex('name', 'name', { unique: true });
+                        
+                        // إنشاء مخزن للدرجات
+                        const gradesStore = db.createObjectStore('grades', { keyPath: 'id', autoIncrement: true });
+                        gradesStore.createIndex('studentId', 'studentId', { unique: false });
+                        gradesStore.createIndex('subjectId', 'subjectId', { unique: false });
+                        
+                        // إنشاء مخزن للإعدادات
+                        const settingsStore = db.createObjectStore('settings', { keyPath: 'id' });
+                        
+                        // إضافة إعدادات افتراضية
+                        settingsStore.put({ id: 'schoolName', value: 'مدرسة الوليد' });
+                        settingsStore.put({ id: 'schoolAddress', value: 'الرياض، السعودية' });
+                        settingsStore.put({ id: 'language', value: 'ar' });
+                        
+                        console.log('تم إنشاء هيكل قاعدة البيانات');
+                    };
+                });
+            }
+
+            // ========= دوال قاعدة البيانات =========
+
+            function addStudent(student) {
+                return new Promise((resolve, reject) => {
+                    const transaction = appState.db.transaction(['students'], 'readwrite');
+                    const store = transaction.objectStore('students');
+                    
+                    const request = store.add(student);
+                    
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = (event) => reject(event.target.error);
+                });
+            }
+
+            function getAllStudents() {
+                return new Promise((resolve, reject) => {
+                    const transaction = appState.db.transaction(['students'], 'readonly');
+                    const store = transaction.objectStore('students');
+                    const request = store.getAll();
+                    
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = (event) => reject(event.target.error);
+                });
+            }
+
+            function getStudentsByClass(classId, academicYear) {
+                return new Promise((resolve, reject) => {
+                    const transaction = appState.db.transaction(['students'], 'readonly');
+                    const store = transaction.objectStore('students');
+                    const index = store.index('classId');
+                    const request = index.getAll(classId);
+                    
+                    request.onsuccess = () => {
+                        let students = request.result;
+                        if (academicYear) {
+                            students = students.filter(s => s.academicYear === academicYear);
+                        }
+                        resolve(students);
+                    };
+                    request.onerror = (event) => reject(event.target.error);
+                });
+            }
+
+            function addSubject(subject) {
+                return new Promise((resolve, reject) => {
+                    const transaction = appState.db.transaction(['subjects'], 'readwrite');
+                    const store = transaction.objectStore('subjects');
+                    
+                    const request = store.add(subject);
+                    
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = (event) => reject(event.target.error);
+                });
+            }
+
+            function addGrade(grade) {
+                return new Promise((resolve, reject) => {
+                    const transaction = appState.db.transaction(['grades'], 'readwrite');
+                    const store = transaction.objectStore('grades');
+                    
+                    const request = store.add(grade);
+                    
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = (event) => reject(event.target.error);
+                });
+            }
+
+            function getSettings() {
+                return new Promise((resolve, reject) => {
+                    const transaction = appState.db.transaction(['settings'], 'readonly');
+                    const store = transaction.objectStore('settings');
+                    const request = store.getAll();
+                    
+                    request.onsuccess = () => {
+                        const settings = {};
+                        request.result.forEach(setting => {
+                            settings[setting.id] = setting.value;
+                        });
+                        resolve(settings);
+                    };
+                    request.onerror = (event) => reject(event.target.error);
+                });
+            }
+
+            function saveSetting(id, value) {
+                return new Promise((resolve, reject) => {
+                    const transaction = appState.db.transaction(['settings'], 'readwrite');
+                    const store = transaction.objectStore('settings');
+                    
+                    const request = store.put({ id, value });
+                    
+                    request.onsuccess = () => resolve();
+                    request.onerror = (event) => reject(event.target.error);
+                });
+            }
+
+            // ========= دوال التطبيق =========
+
+            function initApp() {
+                initDatabase().then(() => {
+                    console.log('التطبيق جاهز للاستخدام');
+                    loadSettings();
+                    
+                    // إعداد معالجات الأحداث
+                    setupEventListeners();
+                    
+                }).catch(error => {
+                    console.error('خطأ في تهيئة التطبيق:', error);
+                    showMessage('auth-message', 'حدث خطأ في تهيئة قاعدة البيانات', 'error');
+                });
+            }
+
+            function setupEventListeners() {
+                // التنقل بين الشاشات
+                navButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const screenId = button.getAttribute('data-screen');
+                        
+                        navButtons.forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        
+                        contentScreens.forEach(screen => screen.classList.add('hidden'));
+                        document.getElementById(`${screenId}-screen`).classList.remove('hidden');
+
+                        if (screenId === 'students') {
+                            loadStudents();
+                        }
+                    });
+                });
+
+                // تسجيل الدخول
+                loginBtn.addEventListener('click', handleLogin);
+                
+                // تسجيل الخروج
+                logoutBtn.addEventListener('click', handleLogout);
+                
+                // تسجيل حساب جديد
+                registerBtn.addEventListener('click', handleRegister);
+                
+                // استيراد ملف Excel
+                excelFileInput.addEventListener('change', handleFileSelect);
+                
+                // سحب وإسقاط الملف
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    dropArea.addEventListener(eventName, preventDefaults, false);
+                });
+                
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    dropArea.addEventListener(eventName, highlight, false);
+                });
+                
+                ['dragleave', 'drop'].forEach(eventName => {
+                    dropArea.addEventListener(eventName, unhighlight, false);
+                });
+                
+                dropArea.addEventListener('drop', handleDrop, false);
+                
+                importBtn.addEventListener('click', importExcelData);
+                
+                // طباعة جميع الطلاب
+                printAllBtn.addEventListener('click', printAllStudents);
+                
+                // إدارة مشغل PDF
+                closePdfBtn.addEventListener('click', () => {
+                    pdfViewer.classList.add('hidden');
+                });
+                
+                downloadPdfBtn.addEventListener('click', downloadPdf);
+                printPdfBtn.addEventListener('click', printPdf);
+
+                // حفظ الإعدادات
+                document.getElementById('save-settings-btn').addEventListener('click', saveSettings);
+
+                // حفظ القالب
+                document.getElementById('save-template-btn').addEventListener('click', saveTemplate);
+
+                // النسخ الاحتياطي
+                exportDataBtn.addEventListener('click', exportData);
+                exportStudentsBtn.addEventListener('click', exportStudents);
+                importBackupBtn.addEventListener('click', importBackup);
+
+                // تحديث زر الاستيراد عند تغيير السنة الدراسية
+                academicYearInput.addEventListener('input', () => {
+                    importBtn.disabled = !academicYearInput.value || !appState.selectedSheet;
+                });
+            }
+
+            function handleLogin() {
+                const email = emailInput.value;
+                const password = passwordInput.value;
+                
+                if (!email || !password) {
+                    showAuthMessage('الرجاء إدخال البريد الإلكتروني وكلمة المرور', 'error');
+                    return;
+                }
+                
+                // في تطبيق حقيقي، هنا يتم التحقق من بيانات المستخدم
+                // في هذا المثال، نسمح بتسجيل الدخول بأي بيانات
+                appState.currentUser = {
+                    email: email,
+                    name: 'مدير النظام'
+                };
+                
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('main-screen').classList.remove('hidden');
+                document.getElementById('username-display').textContent = email;
+                
+                loadSchoolData();
+                
+                showAuthMessage('تم تسجيل الدخول بنجاح', 'success');
+            }
+
+            function handleLogout() {
+                appState.currentUser = null;
+                document.getElementById('auth-screen').classList.remove('hidden');
+                document.getElementById('main-screen').classList.add('hidden');
+                emailInput.value = '';
+                passwordInput.value = '';
+            }
+
+            function handleRegister() {
+                const email = emailInput.value;
+                const password = passwordInput.value;
+                
+                if (!email || !password) {
+                    showAuthMessage('الرجاء إدخال البريد الإلكتروني وكلمة المرور', 'error');
+                    return;
+                }
+                
+                showAuthMessage('تم إنشاء الحساب بنجاح. يمكنك تسجيل الدخول الآن.', 'success');
+            }
+
+            function loadSettings() {
+                getSettings().then(settings => {
+                    if (settings.schoolName) {
+                        document.getElementById('school-name').textContent = settings.schoolName;
+                        document.getElementById('school-name-input').value = settings.schoolName;
+                    }
+                    if (settings.schoolAddress) {
+                        document.getElementById('school-address').value = settings.schoolAddress;
+                    }
+                    if (settings.language) {
+                        document.getElementById('language-select').value = settings.language;
+                    }
+                });
+            }
+
+            function loadSchoolData() {
+                getSettings().then(settings => {
+                    document.getElementById('school-name').textContent = settings.schoolName || 'مدرسة الوليد';
+                });
+            }
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            function highlight() {
+                dropArea.classList.add('highlight');
+            }
+            
+            function unhighlight() {
+                dropArea.classList.remove('highlight');
+            }
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                excelFileInput.files = files;
+                handleFileSelect({ target: excelFileInput });
+            }
+
+            function handleFileSelect(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                appState.fileName = file.name;
+                
+                const fileInfo = document.getElementById('file-info');
+                fileInfo.innerHTML = `
+                    <p>تم اختيار الملف: <strong>${file.name}</strong></p>
+                    <p>الحجم: ${(file.size / 1024).toFixed(2)} KB</p>
+                `;
+                
+                extractAcademicYearFromFileName(file.name);
+                readExcelSheets(file);
+            }
+
+            function extractAcademicYearFromFileName(fileName) {
+                const yearPattern1 = /(\d{4})[-_](\d{4})/;
+                const yearPattern2 = /(\d{2})[-_](\d{2})/;
+                
+                let yearMatch = fileName.match(yearPattern1);
+                
+                if (!yearMatch) {
+                    yearMatch = fileName.match(yearPattern2);
+                    if (yearMatch) {
+                        const year1 = parseInt(yearMatch[1]) + 1400;
+                        const year2 = parseInt(yearMatch[2]) + 1400;
+                        academicYearInput.value = `${year1}-${year2}`;
+                        return;
+                    }
+                }
+                
+                if (yearMatch) {
+                    academicYearInput.value = `${yearMatch[1]}-${yearMatch[2]}`;
+                } else {
+                    academicYearInput.value = '';
+                    academicYearInput.placeholder = 'لم يتم التعرف على السنة، الرجاء إدخالها يدوياً';
+                }
+                
+                yearSelection.classList.remove('hidden');
+            }
+
+            function readExcelSheets(file) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        
+                        appState.excelSheets = workbook.SheetNames;
+                        displaySheetList(workbook.SheetNames);
+                        
+                    } catch (error) {
+                        console.error('Error reading Excel file:', error);
+                        showMessage('import-message', 'حدث خطأ أثناء قراءة ملف Excel', 'error');
+                    }
+                };
+                
+                reader.onerror = function() {
+                    showMessage('import-message', 'حدث خطأ أثناء قراءة الملف', 'error');
+                };
+                
+                reader.readAsArrayBuffer(file);
+            }
+
+            function displaySheetList(sheets) {
+                sheetList.innerHTML = '';
+                appState.selectedSheet = null;
+                
+                sheets.forEach(sheet => {
+                    const li = document.createElement('li');
+                    li.className = 'sheet-item';
+                    li.textContent = sheet;
+                    li.addEventListener('click', () => selectSheet(sheet, li));
+                    sheetList.appendChild(li);
+                });
+                
+                sheetSelection.classList.remove('hidden');
+                importBtn.disabled = true;
+            }
+
+            function selectSheet(sheetName, element) {
+                const fileInput = document.getElementById('excel-file');
+                const file = fileInput.files[0];
+                
+                if (!file) return;
+                
+                showLoader('import-loader');
+                
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const worksheet = workbook.Sheets[sheetName];
+                        
+                        // تحويل الورقة إلى JSON
+                        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                        
+                        if (jsonData.length < 2) {
+                            throw new Error('الورقة لا تحتوي على بيانات كافية');
+                        }
+                        
+                        appState.sheetData = jsonData;
+                        appState.headers = jsonData[0];
+                        appState.selectedSheet = sheetName;
+                        
+                        // عرض معاينة البيانات
+                        displayDataPreview(jsonData);
+                        
+                        // إعداد خيارات تعيين الأعمدة
+                        setupColumnMapping();
+                        
+                        // تمييز الورقة المحددة
+                        document.querySelectorAll('.sheet-item').forEach(item => {
+                            item.classList.remove('active');
+                        });
+                        element.classList.add('active');
+                        
+                        importBtn.disabled = !academicYearInput.value;
+                        
+                    } catch (error) {
+                        console.error('Error processing sheet:', error);
+                        showMessage('import-message', 'حدث خطأ أثناء معالجة الورقة: ' + error.message, 'error');
+                    } finally {
+                        hideLoader('import-loader');
+                    }
+                };
+                
+                reader.readAsArrayBuffer(file);
+            }
+
+            function displayDataPreview(data) {
+                if (data.length === 0) {
+                    dataPreview.innerHTML = '<p>لا توجد بيانات لعرضها</p>';
+                    return;
+                }
+                
+                let html = '<table><thead><tr>';
+                
+                // عرض العناوين
+                data[0].forEach(header => {
+                    html += `<th>${header || 'بدون عنوان'}</th>`;
+                });
+                
+                html += '</tr></thead><tbody>';
+                
+                // عرض أول 5 صفوف من البيانات
+                const rowsToShow = Math.min(5, data.length - 1);
+                for (let i = 1; i <= rowsToShow; i++) {
+                    html += '<tr>';
+                    data[i].forEach(cell => {
+                        html += `<td>${cell || ''}</td>`;
+                    });
+                    html += '</tr>';
+                }
+                
+                if (data.length > 6) {
+                    html += '<tr><td colspan="' + data[0].length + '" style="text-align:center;">...</td></tr>';
+                }
+                
+                html += '</tbody></table>';
+                
+                dataPreview.innerHTML = html;
+                dataPreview.classList.remove('hidden');
+            }
+
+            function setupColumnMapping() {
+                // مسح الخيارات القديمة
+                idColumnSelect.innerHTML = '';
+                nameColumnSelect.innerHTML = '';
+                classColumnSelect.innerHTML = '<option value="auto">استخدام اسم الشيت تلقائياً</option>';
+                
+                // إضافة خيارات الأعمدة
+                appState.headers.forEach((header, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = header || `العمود ${index + 1}`;
+                    
+                    idColumnSelect.appendChild(option.cloneNode(true));
+                    nameColumnSelect.appendChild(option.cloneNode(true));
+                    classColumnSelect.appendChild(option.cloneNode(true));
+                });
+                
+                // محاولة التعرف التلقائي على الأعمدة
+                autoDetectColumns();
+                
+                columnMapping.classList.remove('hidden');
+            }
+
+            function autoDetectColumns() {
+                appState.headers.forEach((header, index) => {
+                    const headerText = (header || '').toString().toLowerCase();
+                    
+                    if (headerText.includes('رقم') || headerText.includes('id') || headerText.includes('كود')) {
+                        idColumnSelect.value = index;
+                    }
+                    
+                    if (headerText.includes('اسم') || headerText.includes('name')) {
+                        nameColumnSelect.value = index;
+                    }
+                    
+                    if (headerText.includes('صف') || headerText.includes('class') || headerText.includes('فصل')) {
+                        classColumnSelect.value = index;
+                    }
+                });
+            }
+
+            function importExcelData() {
+                const academicYear = academicYearInput.value;
+                
+                if (!appState.selectedSheet || !academicYear) {
+                    showMessage('import-message', 'الرجاء اختيار ورقة وتحديد السنة الدراسية', 'error');
+                    return;
+                }
+                
+                const idColumn = parseInt(idColumnSelect.value);
+                const nameColumn = parseInt(nameColumnSelect.value);
+                const classColumn = classColumnSelect.value === 'auto' ? null : parseInt(classColumnSelect.value);
+                
+                if (isNaN(idColumn)) {
+                    showMessage('import-message', 'الرجاء تحديد عمود رقم الطالب', 'error');
+                    return;
+                }
+                
+                if (isNaN(nameColumn)) {
+                    showMessage('import-message', 'الرجاء تحديد عمود اسم الطالب', 'error');
+                    return;
+                }
+                
+                showLoader('import-loader');
+                hideMessage('import-message');
+                
+                try {
+                    const students = [];
+                    const subjects = [];
+                    const subjectIndices = [];
+                    
+                    // تحديد أعمدة المواد الدراسية (كل الأعمدة ما عدا التي تم تحديدها)
+                    for (let i = 0; i < appState.headers.length; i++) {
+                        if (i !== idColumn && i !== nameColumn && (classColumn === null || i !== classColumn)) {
+                            subjectIndices.push(i);
+                            subjects.push({
+                                name: appState.headers[i] || `المادة ${i + 1}`,
+                                code: `SUBJ_${i}`
+                            });
+                        }
+                    }
+                    
+                    // معالجة بيانات الطلاب
+                    for (let i = 1; i < appState.sheetData.length; i++) {
+                        const row = appState.sheetData[i];
+                        
+                        // تجاهل الصفوف الفارغة
+                        if (!row[idColumn] && !row[nameColumn]) continue;
+                        
+                        const student = {
+                            studentNumber: row[idColumn]?.toString() || '',
+                            fullName: row[nameColumn]?.toString() || '',
+                            classId: classColumn !== null ? row[classColumn]?.toString() : appState.selectedSheet,
+                            academicYear: academicYear,
+                            grades: {}
+                        };
+                        
+                        // إضافة الدرجات
+                        subjectIndices.forEach((subjectIndex, idx) => {
+                            if (row[subjectIndex] !== undefined && row[subjectIndex] !== null && row[subjectIndex] !== '') {
+                                student.grades[subjects[idx].name] = row[subjectIndex];
+                            }
+                        });
+                        
+                        students.push(student);
+                    }
+                    
+                    // حفظ البيانات في قاعدة البيانات
+                    saveImportedData(students, subjects).then(() => {
+                        showMessage('import-message', `تم استيراد ${students.length} طالب بنجاح`, 'success');
+                        loadStudents();
+                        updateYearFilter();
+                        document.querySelector('[data-screen="students"]').click();
+                    }).catch(error => {
+                        console.error('Error saving imported data:', error);
+                        showMessage('import-message', 'حدث خطأ أثناء حفظ البيانات: ' + error.message, 'error');
+                    }).finally(() => {
+                        hideLoader('import-loader');
+                    });
+                    
+                } catch (error) {
+                    console.error('Error importing data:', error);
+                    showMessage('import-message', 'حدث خطأ أثناء استيراد البيانات: ' + error.message, 'error');
+                    hideLoader('import-loader');
+                }
+            }
+
+            async function saveImportedData(students, subjects) {
+                // حفظ المواد الدراسية أولاً
+                const subjectIds = {};
+                for (const subject of subjects) {
+                    const subjectId = await addSubject(subject);
+                    subjectIds[subject.name] = subjectId;
+                }
+                
+                // حفظ الطلاب ودرجاتهم
+                for (const student of students) {
+                    const studentId = await addStudent({
+                        studentNumber: student.studentNumber,
+                        fullName: student.fullName,
+                        classId: student.classId,
+                        academicYear: student.academicYear
+                    });
+                    
+                    // حفظ الدرجات
+                    for (const [subjectName, grade] of Object.entries(student.grades)) {
+                        if (subjectIds[subjectName]) {
+                            await addGrade({
+                                studentId: studentId,
+                                subjectId: subjectIds[subjectName],
+                                grade: grade,
+                                maxGrade: 100,
+                                date: new Date().toISOString()
+                            });
+                        }
+                    }
+                }
+            }
+
+            function updateYearFilter() {
+                const yearFilter = document.getElementById('year-filter');
+                const academicYear = academicYearInput.value;
+                
+                // إضافة السنة الجديدة إذا لم تكن موجودة
+                if (!Array.from(yearFilter.options).some(opt => opt.value === academicYear)) {
+                    const option = document.createElement('option');
+                    option.value = academicYear;
+                    option.textContent = academicYear;
+                    yearFilter.appendChild(option);
+                }
+                
+                yearFilter.value = academicYear;
+            }
+
+            function loadStudents() {
+                showLoader('students-loader');
+                hideMessage('students-message');
+                
+                getAllStudents().then(students => {
+                    appState.students = students;
+                    renderStudentsList(students);
+                    updateClassFilter();
+                }).catch(error => {
+                    console.error('Error loading students:', error);
+                    showMessage('students-message', 'حدث خطأ أثناء جلب بيانات الطلاب', 'error');
+                }).finally(() => {
+                    hideLoader('students-loader');
+                });
+            }
+
+            function updateClassFilter() {
+                const classFilter = document.getElementById('class-filter');
+                classFilter.innerHTML = '<option value="">كل الصفوف</option>';
+                
+                // جمع جميع الصفوف الفريدة من بيانات الطلاب
+                const uniqueClasses = [...new Set(appState.students.map(s => s.classId))];
+                
+                uniqueClasses.forEach(classId => {
+                    const option = document.createElement('option');
+                    option.value = classId;
+                    option.textContent = classId;
+                    classFilter.appendChild(option);
+                });
+            }
+
+            function renderStudentsList(students) {
+                studentsList.innerHTML = '';
+                
+                if (students.length === 0) {
+                    studentsList.innerHTML = '<p>لا يوجد طلاب مسجلين</p>';
+                    return;
+                }
+                
+                students.forEach(student => {
+                    const studentCard = document.createElement('div');
+                    studentCard.className = 'student-card';
+                    studentCard.innerHTML = `
+                        <h3>${student.fullName}</h3>
+                        <p>رقم الطالب: ${student.studentNumber}</p>
+                        <p>الصف: ${student.classId}</p>
+                        <p>السنة: ${student.academicYear}</p>
+                        <div class="student-actions">
+                            <button class="view-btn" data-id="${student.id}">عرض</button>
+                            <button class="print-btn" data-id="${student.id}">طباعة</button>
+                        </div>
+                    `;
+                    
+                    studentsList.appendChild(studentCard);
+                });
+                
+                document.querySelectorAll('.view-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const studentId = parseInt(e.target.getAttribute('data-id'));
+                        viewStudentDetails(studentId);
+                    });
+                });
+                
+                document.querySelectorAll('.print-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const studentId = parseInt(e.target.getAttribute('data-id'));
+                        printStudentReport(studentId);
+                    });
+                });
+            }
+
+            async function viewStudentDetails(studentId) {
+                try {
+                    // جلب بيانات الطالب
+                    const transaction = appState.db.transaction(['students', 'grades', 'subjects'], 'readonly');
+                    const studentsStore = transaction.objectStore('students');
+                    const gradesStore = transaction.objectStore('grades');
+                    const subjectsStore = transaction.objectStore('subjects');
+                    
+                    const student = await new Promise((resolve, reject) => {
+                        const request = studentsStore.get(studentId);
+                        request.onsuccess = () => resolve(request.result);
+                        request.onerror = (event) => reject(event.target.error);
+                    });
+                    
+                    if (!student) {
+                        throw new Error('الطالب غير موجود');
+                    }
+                    
+                    // جلب جميع المواد الدراسية
+                    const subjects = await new Promise((resolve, reject) => {
+                        const request = subjectsStore.getAll();
+                        request.onsuccess = () => resolve(request.result);
+                        request.onerror = (event) => reject(event.target.error);
+                    });
+                    
+                    // جلب درجات الطالب
+                    const grades = await new Promise((resolve, reject) => {
+                        const index = gradesStore.index('studentId');
+                        const request = index.getAll(studentId);
+                        request.onsuccess = () => resolve(request.result);
+                        request.onerror = (event) => reject(event.target.error);
+                    });
+                    
+                    // إنشاء خريطة للمواد
+                    const subjectsMap = {};
+                    subjects.forEach(subject => {
+                        subjectsMap[subject.id] = subject;
+                    });
+                    
+                    // تجميع الدرجات
+                    const studentGrades = {};
+                    grades.forEach(grade => {
+                        if (subjectsMap[grade.subjectId]) {
+                            studentGrades[subjectsMap[grade.subjectId].name] = grade.grade;
+                        }
+                    });
+                    
+                    // عرض بيانات الطالب
+                    displayStudentData(student, studentGrades);
+                    
+                } catch (error) {
+                    console.error('Error viewing student details:', error);
+                    showMessage('students-message', 'حدث خطأ أثناء عرض بيانات الطالب', 'error');
+                }
+            }
+
+            function displayStudentData(student, grades) {
+                appState.selectedStudent = { ...student, grades };
+                
+                let gradesHtml = '';
+                for (const [subject, grade] of Object.entries(grades)) {
+                    gradesHtml += `<tr><td>${subject}</td><td>${grade}</td></tr>`;
+                }
+                
+                const htmlContent = `
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <img src="https://via.placeholder.com/150x50?text=شعار+المدرسة" alt="شعار المدرسة" style="max-width: 150px;">
+                        <h1 style="margin: 10px 0;">${document.getElementById('school-name-input').value}</h1>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <p><strong>اسم الطالب:</strong> ${student.fullName}</p>
+                        <p><strong>رقم الطالب:</strong> ${student.studentNumber}</p>
+                        <p><strong>الصف:</strong> ${student.classId}</p>
+                        <p><strong>السنة الدراسية:</strong> ${student.academicYear}</p>
+                    </div>
+                    
+                    <table border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                        <thead>
+                            <tr>
+                                <th>المادة</th>
+                                <th>الدرجة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${gradesHtml}
+                        </tbody>
+                    </table>
+                    
+                    <div style="margin-top: 40px; text-align: left;">
+                        <p>مدير المدرسة: ________________________</p>
+                        <p>التاريخ: ${new Date().toLocaleDateString('ar-SA')}</p>
+                    </div>
+                `;
+                
+                const iframe = document.getElementById('pdf-frame');
+                iframe.srcdoc = `
+                    <!DOCTYPE html>
+                    <html dir="rtl">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>شهادة ${student.fullName}</title>
+                        <style>
+                            body { font-family: Arial; padding: 20px; }
+                            table { width: 100%; border-collapse: collapse; }
+                            th, td { border: 1px solid #000; padding: 8px; text-align: center; }
+                        </style>
+                    </head>
+                    <body>
+                        ${htmlContent}
+                    </body>
+                    </html>
+                `;
+                
+                pdfViewer.classList.remove('hidden');
+            }
+
+            function printStudentReport(studentId) {
+                viewStudentDetails(studentId);
+                
+                setTimeout(() => {
+                    document.getElementById('print-pdf-btn').click();
+                }, 500);
+            }
+
+            function printAllStudents() {
+                const yearFilter = document.getElementById('year-filter').value;
+                const classFilter = document.getElementById('class-filter').value;
+                
+                if (!classFilter) {
+                    showMessage('students-message', 'الرجاء تحديد الصف الدراسي', 'error');
+                    return;
+                }
+                
+                showLoader('students-loader');
+                
+                getStudentsByClass(classFilter, yearFilter).then(students => {
+                    if (students.length === 0) {
+                        showMessage('students-message', 'لا يوجد طلاب في هذا الصف', 'error');
+                        return;
+                    }
+                    
+                    // عرض أول طالب (في تطبيق حقيقي، يمكن إنشاء ملف PDF متعدد الصفحات)
+                    viewStudentDetails(students[0].id);
+                    showMessage('students-message', `تم تحميل ${students.length} طالب. سيتم طباعة الجميع في ملف PDF متعدد الصفحات.`, 'success');
+                    
+                }).catch(error => {
+                    console.error('Error printing all students:', error);
+                    showMessage('students-message', 'حدث خطأ أثناء جلب بيانات الطلاب', 'error');
+                }).finally(() => {
+                    hideLoader('students-loader');
+                });
+            }
+
+            function downloadPdf() {
+                const link = document.createElement('a');
+                link.href = 'data:application/pdf;base64,...';
+                link.download = 'شهادة الطالب.pdf';
+                link.click();
+            }
+
+            function printPdf() {
+                window.print();
+            }
+
+            function saveSettings() {
+                const schoolName = document.getElementById('school-name-input').value;
+                const schoolAddress = document.getElementById('school-address').value;
+                const language = document.getElementById('language-select').value;
+                
+                Promise.all([
+                    saveSetting('schoolName', schoolName),
+                    saveSetting('schoolAddress', schoolAddress),
+                    saveSetting('language', language)
+                ]).then(() => {
+                    document.getElementById('school-name').textContent = schoolName;
+                    showMessage('settings-message', 'تم حفظ الإعدادات بنجاح', 'success');
+                }).catch(error => {
+                    console.error('Error saving settings:', error);
+                    showMessage('settings-message', 'حدث خطأ أثناء حفظ الإعدادات', 'error');
+                });
+            }
+
+            function saveTemplate() {
+                showMessage('templates-message', 'تم حفظ القالب بنجاح', 'success');
+            }
+
+            function exportData() {
+                Promise.all([
+                    getAllStudents(),
+                    new Promise((resolve, reject) => {
+                        const transaction = appState.db.transaction(['subjects'], 'readonly');
+                        const store = transaction.objectStore('subjects');
+                        const request = store.getAll();
+                        request.onsuccess = () => resolve(request.result);
+                        request.onerror = (event) => reject(event.target.error);
+                    }),
+                    new Promise((resolve, reject) => {
+                        const transaction = appState.db.transaction(['grades'], 'readonly');
+                        const store = transaction.objectStore('grades');
+                        const request = store.getAll();
+                        request.onsuccess = () => resolve(request.result);
+                        request.onerror = (event) => reject(event.target.error);
+                    }),
+                    getSettings()
+                ]).then(([students, subjects, grades, settings]) => {
+                    const data = {
+                        students,
+                        subjects,
+                        grades,
+                        settings,
+                        exportedAt: new Date().toISOString()
+                    };
+                    
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `school_data_${new Date().toISOString().split('T')[0]}.json`;
+                    a.click();
+                    
+                    URL.revokeObjectURL(url);
+                    
+                    showMessage('backup-message', 'تم تصدير جميع البيانات بنجاح', 'success');
+                }).catch(error => {
+                    console.error('Error exporting data:', error);
+                    showMessage('backup-message', 'حدث خطأ أثناء تصدير البيانات', 'error');
+                });
+            }
+
+            function exportStudents() {
+                getAllStudents().then(students => {
+                    const data = {
+                        students,
+                        exportedAt: new Date().toISOString()
+                    };
+                    
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `students_data_${new Date().toISOString().split('T')[0]}.json`;
+                    a.click();
+                    
+                    URL.revokeObjectURL(url);
+                    
+                    showMessage('backup-message', 'تم تصدير بيانات الطلاب بنجاح', 'success');
+                }).catch(error => {
+                    console.error('Error exporting students:', error);
+                    showMessage('backup-message', 'حدث خطأ أثناء تصدير بيانات الطلاب', 'error');
+                });
+            }
+
+            function importBackup() {
+                const file = backupFileInput.files[0];
+                if (!file) {
+                    showMessage('backup-message', 'الرجاء اختيار ملف النسخ الاحتياطي', 'error');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        
+                        if (!data.students || !Array.isArray(data.students)) {
+                            throw new Error('الملف لا يحتوي على بيانات صالحة');
+                        }
+                        
+                        showLoader('import-loader');
+                        
+                        // استيراد البيانات
+                        saveImportedData(data.students, data.subjects || []).then(() => {
+                            showMessage('backup-message', 'تم استيراد البيانات بنجاح', 'success');
+                            loadStudents();
+                        }).catch(error => {
+                            console.error('Error importing backup:', error);
+                            showMessage('backup-message', 'حدث خطأ أثناء استيراد البيانات: ' + error.message, 'error');
+                        }).finally(() => {
+                            hideLoader('import-loader');
+                        });
+                        
+                    } catch (error) {
+                        console.error('Error parsing backup file:', error);
+                        showMessage('backup-message', 'ملف غير صالح: ' + error.message, 'error');
+                    }
+                };
+                
+                reader.onerror = function() {
+                    showMessage('backup-message', 'حدث خطأ أثناء قراءة الملف', 'error');
+                };
+                
+                reader.readAsText(file);
+            }
+
+            function showAuthMessage(message, type) {
+                authMessage.textContent = message;
+                authMessage.className = `alert alert-${type}`;
+                authMessage.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    authMessage.classList.add('hidden');
+                }, 5000);
+            }
+
+            function showMessage(elementId, message, type) {
+                const element = document.getElementById(elementId);
+                element.textContent = message;
+                element.className = `alert alert-${type}`;
+                element.classList.remove('hidden');
+            }
+
+            function hideMessage(elementId) {
+                document.getElementById(elementId).classList.add('hidden');
+            }
+
+            function showLoader(elementId) {
+                document.getElementById(elementId).classList.remove('hidden');
+            }
+
+            function hideLoader(elementId) {
+                document.getElementById(elementId).classList.add('hidden');
+            }
+
+            // بدء تشغيل التطبيق
+            initApp();
+        });
+    </script>
+</body>
+</html>
